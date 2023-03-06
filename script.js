@@ -15,11 +15,19 @@ window.addEventListener("DOMContentLoaded", () => {
   let initial = false;
   let zero = false;
   let limit = false;
-  let op = false;
-  let opValue = null;
+  let prevOp = null;
+  let firstOp = false;
+  let secondOp = false;
 
   numbers.forEach((num) => {
     num.addEventListener("click", (e) => {
+      //сброс операторов /*-+
+      if (prevOp !== null) {
+        firstOp = false;
+        secondOp = false;
+        prevOp = null;
+        result.innerHTML = null;
+      }
       //проверка лимита
       if (result.innerHTML.length === 22 || limit) {
         limit = true;
@@ -39,7 +47,6 @@ window.addEventListener("DOMContentLoaded", () => {
         initial = true;
         result.innerHTML = e.target.innerText;
         res = e.target.innerText;
-        op = true;
       }
       // старт и нажата . с проверкой, что нажимается не 2 раз
       else if (initial === false && e.target.innerText === "." && decimal) {
@@ -49,7 +56,6 @@ window.addEventListener("DOMContentLoaded", () => {
         initial = true;
         result.innerHTML = "0.";
         res = "0.";
-        op = true;
       }
       // старт и нажат первым 0
       else if (
@@ -62,7 +68,6 @@ window.addEventListener("DOMContentLoaded", () => {
         zero = true;
         result.innerHTML = e.target.innerText;
         res = e.target.innerText;
-        op = true;
       }
       // ввод числа начался
       else if (initial === true) {
@@ -111,52 +116,67 @@ window.addEventListener("DOMContentLoaded", () => {
 
   operators.forEach((operator) => {
     operator.addEventListener("click", (e) => {
-      console.log(op);
-      console.log(initial);
-      //Условие для первого знака оператора
-      if (!op) {
-        console.log("Условие для первого знака оператора");
-        //если + или - нажат, то вставляем в выражение
-        if (e.target.innerText === "+" || e.target.innerText === "-") {
-          expression.innerHTML += e.target.innerText;
-          result.innerHTML = e.target.innerText;
-          initial = false;
-          decimal = true;
-          limit = false;
-          op = true;
-        }
+      // самый первый знак
+      if (expression.innerHTML.length <= 1 && !initial) {
+        console.log("самый первый знак");
+        expression.innerHTML = e.target.innerText;
+        result.innerHTML = e.target.innerText;
+        initial = false;
+        decimal = true;
+        limit = false;
+        return;
       }
-      // Условие для остальных знаков оператора
-      else if (initial && op) {
-        //если это первый знак
-        console.log("знак посередине");
-        console.log(opValue);
-        console.log(e.target.innerText);
-        if (opValue === null) {
-          console.log(
-            " Условие для остальных знаков оператора если это первый знак"
-          );
+      // первый знак не ввели
+      if (!firstOp) {
+        console.log("первый знак не ввели");
+        expression.innerHTML += e.target.innerText;
+        result.innerHTML = e.target.innerText;
+        prevOp = e.target.innerText;
+        firstOp = true;
+
+        initial = false;
+        decimal = true;
+        limit = false;
+      }
+      // первый знак уже введен
+      else if (firstOp) {
+        console.log("первый знак уже введен");
+        //если второй знак минус то его добавляем
+        if (e.target.innerText === "-" && !secondOp) {
+          console.log("если второй знак минус то его добавляем");
           expression.innerHTML += e.target.innerText;
           result.innerHTML = e.target.innerText;
+          prevOp = e.target.innerText;
+          secondOp = true;
+
           initial = false;
           decimal = true;
           limit = false;
-          op = true;
-          opValue = e.target.innerText;
         }
-        //если это второй знак +- -- *- /-
-        else if (
-          (opValue === "+" && e.target.innerText === "-") ||
-          (opValue === "-" && e.target.innerText === "-") ||
-          (opValue === "*" && e.target.innerText === "-") ||
-          (opValue === "/" && e.target.innerText === "-")
-        ) {
-          console.log(
-            " Условие для остальных знаков оператора если это второй знак +- -- *- /-"
-          );
-          expression.innerHTML += e.target.innerText;
+        // если это не -, тогда мы меняем знак на другой
+        else if (e.target.innerText !== "-" && !secondOp) {
+          console.log("если это не -, тогда мы меняем знак на другой");
+          let strExp = expression.innerHTML;
+          let strRes = result.innerHTML;
+
+          strExp = strExp.replaceAt(strExp.length - 1, e.target.innerText);
+          strRes = strExp.replaceAt(strRes.length - 1, e.target.innerText);
+
+          expression.innerHTML = strExp;
           result.innerHTML = e.target.innerText;
-          opValue = null;
+
+          prevOp = e.target.innerText;
+          // secondOp = true;
+
+          initial = false;
+          decimal = true;
+          limit = false;
+        }
+
+        // два знака введено, больше нельзя
+        else if (secondOp) {
+          console.log("два знака введено, больше нельзя");
+          return;
         }
       }
     });
@@ -169,9 +189,20 @@ window.addEventListener("DOMContentLoaded", () => {
     decimal = true;
     limit = false;
     res = null;
-    op = false;
-    opValue = null;
+    firstOp = false;
+    secondOp = false;
+    prevOp = null;
   });
+
+  String.prototype.replaceAt = function (index, replacement) {
+    if (index >= this.length) {
+      return this.valueOf();
+    }
+
+    var chars = this.split("");
+    chars[index] = replacement;
+    return chars.join("");
+  };
 
   const calc = (value) => {};
 });
