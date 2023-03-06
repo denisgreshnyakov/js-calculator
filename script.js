@@ -86,7 +86,16 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         // если на старте был уже введен 0 и вводится число кроме 0 и .
         else if (zero && e.target.innerText !== "0") {
-          expression.innerHTML = e.target.innerText;
+          console.log(`сработал этот блок`);
+
+          let strExp = expression.innerHTML;
+
+          strExp = strExp.replaceAt(strExp.length - 1, e.target.innerText);
+
+          // expression.innerHTML = e.target.innerText;
+          // result.innerHTML = e.target.innerText;
+
+          expression.innerHTML = strExp;
           result.innerHTML = e.target.innerText;
           res = e.target.innerText;
           zero = false;
@@ -118,7 +127,6 @@ window.addEventListener("DOMContentLoaded", () => {
     operator.addEventListener("click", (e) => {
       // самый первый знак
       if (expression.innerHTML.length <= 1 && !initial) {
-        console.log("самый первый знак");
         expression.innerHTML = e.target.innerText;
         result.innerHTML = e.target.innerText;
         initial = false;
@@ -128,7 +136,6 @@ window.addEventListener("DOMContentLoaded", () => {
       }
       // первый знак не ввели
       if (!firstOp) {
-        console.log("первый знак не ввели");
         expression.innerHTML += e.target.innerText;
         result.innerHTML = e.target.innerText;
         prevOp = e.target.innerText;
@@ -140,10 +147,8 @@ window.addEventListener("DOMContentLoaded", () => {
       }
       // первый знак уже введен
       else if (firstOp) {
-        console.log("первый знак уже введен");
         //если второй знак минус то его добавляем
         if (e.target.innerText === "-" && !secondOp) {
-          console.log("если второй знак минус то его добавляем");
           expression.innerHTML += e.target.innerText;
           result.innerHTML = e.target.innerText;
           prevOp = e.target.innerText;
@@ -155,7 +160,6 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         // если это не -, тогда мы меняем знак на другой
         else if (e.target.innerText !== "-" && !secondOp) {
-          console.log("если это не -, тогда мы меняем знак на другой");
           let strExp = expression.innerHTML;
           let strRes = result.innerHTML;
 
@@ -175,7 +179,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
         // два знака введено, больше нельзя
         else if (secondOp) {
-          console.log("два знака введено, больше нельзя");
           return;
         }
       }
@@ -192,6 +195,45 @@ window.addEventListener("DOMContentLoaded", () => {
     firstOp = false;
     secondOp = false;
     prevOp = null;
+  });
+
+  equals.addEventListener("click", () => {
+    let operands = [];
+    let operand = "";
+    let str = expression.innerHTML;
+    for (let i = 0; i < str.length; i++) {
+      if (
+        str[i] === "0" ||
+        str[i] === "1" ||
+        str[i] === "1" ||
+        str[i] === "2" ||
+        str[i] === "3" ||
+        str[i] === "4" ||
+        str[i] === "5" ||
+        str[i] === "6" ||
+        str[i] === "7" ||
+        str[i] === "8" ||
+        str[i] === "9"
+      ) {
+        console.log("число");
+        operand += str[i];
+      } else if (str[i] === ".") {
+        console.log(".");
+        operand += str[i];
+      } else if (
+        str[i] === "+" ||
+        str[i] === "-" ||
+        str[i] === "x" ||
+        str[i] === "/"
+      ) {
+        console.log("знак");
+        operands.push(operand);
+        operand = "";
+      }
+    }
+    operands.push(operand);
+    console.log(operand);
+    console.log(operands);
   });
 
   String.prototype.replaceAt = function (index, replacement) {
