@@ -86,3 +86,11 @@ body {
   text-align: center;
   margin: 10px;
 }
+
+a,
+a:active,
+a:hover {
+  text-decoration: none;
+  color: red;
+  cursor: pointer;
+}
